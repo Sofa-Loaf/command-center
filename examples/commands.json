@@ -1,0 +1,516 @@
+{
+  "schemaVersion": 1,
+  "tabs": [
+    {
+      "name": "Diagnostics",
+      "commands": [
+        {
+          "title": "Ping host (4 probes)",
+          "notes": "ICMP reachability. Replace host, then paste into the remote shell.",
+          "tags": ["icmp", "latency"],
+          "os": "linux",
+          "body": "ping -c 4 {{host}}",
+          "favorite": true
+        },
+        {
+          "title": "MTR report",
+          "notes": "Path + loss snapshot. Needs mtr installed on the target.",
+          "tags": ["path", "loss"],
+          "os": "linux",
+          "body": "mtr -rw -c 10 {{host}}"
+        },
+        {
+          "title": "DNS lookup (dig)",
+          "notes": "A/AAAA plus NS and SOA for a name.",
+          "tags": ["dns"],
+          "os": "linux",
+          "body": "dig +nocmd {{host}} A {{host}} AAAA {{host}} NS +noall +answer"
+        },
+        {
+          "title": "Traceroute",
+          "notes": "Classic hop-by-hop path.",
+          "tags": ["path"],
+          "os": "linux",
+          "body": "traceroute -n {{host}}"
+        },
+        {
+          "title": "Load and uptime",
+          "notes": "Quick health snapshot before deeper troubleshooting.",
+          "tags": ["cpu", "health"],
+          "os": "linux",
+          "body": "uptime; echo; cat /proc/loadavg; echo; nproc"
+        },
+        {
+          "title": "Kernel warnings (dmesg)",
+          "notes": "Last 80 error/warn lines from the ring buffer.",
+          "tags": ["kernel"],
+          "os": "linux",
+          "body": "dmesg -T --level=err,warn | tail -n 80"
+        },
+        {
+          "title": "Test-NetConnection",
+          "notes": "Windows TCP probe. Default port 22; change as needed.",
+          "tags": ["tcp", "port"],
+          "os": "windows",
+          "body": "Test-NetConnection -ComputerName {{host}} -Port {{port:22}} -InformationLevel Detailed",
+          "favorite": true
+        },
+        {
+          "title": "Ping (Windows)",
+          "notes": "Four ICMP echoes from cmd/PowerShell.",
+          "tags": ["icmp"],
+          "os": "windows",
+          "body": "ping -n 4 {{host}}"
+        },
+        {
+          "title": "Resolve-DnsName",
+          "notes": "Windows DNS lookup.",
+          "tags": ["dns"],
+          "os": "windows",
+          "body": "Resolve-DnsName {{host}} | Format-Table -AutoSize"
+        },
+        {
+          "title": "Ping (macOS)",
+          "notes": "Four ICMP echoes.",
+          "tags": ["icmp"],
+          "os": "macos",
+          "body": "ping -c 4 {{host}}"
+        }
+      ]
+    },
+    {
+      "name": "Networking",
+      "commands": [
+        {
+          "title": "Address summary",
+          "notes": "Brief IP + state per interface.",
+          "tags": ["ip", "nic"],
+          "os": "linux",
+          "body": "ip -br addr; echo; ip -br link"
+        },
+        {
+          "title": "IPv4 routes",
+          "notes": "Main routing table.",
+          "tags": ["route"],
+          "os": "linux",
+          "body": "ip -4 route show; echo; ip -6 route show"
+        },
+        {
+          "title": "Listening sockets",
+          "notes": "TCP/UDP listeners with process names.",
+          "tags": ["ports", "ss"],
+          "os": "linux",
+          "body": "ss -tulpn",
+          "favorite": true
+        },
+        {
+          "title": "Neighbor / ARP",
+          "notes": "L2 neighbors on the host.",
+          "tags": ["arp"],
+          "os": "linux",
+          "body": "ip neigh show"
+        },
+        {
+          "title": "Interface counters",
+          "notes": "RX/TX stats for one NIC.",
+          "tags": ["nic", "drops"],
+          "os": "linux",
+          "body": "ip -s link show {{interface:eth0}}"
+        },
+        {
+          "title": "curl headers",
+          "notes": "HTTP(S) response headers only.",
+          "tags": ["http"],
+          "os": "generic",
+          "body": "curl -I --max-time 10 https://{{host}}"
+        },
+        {
+          "title": "ipconfig /all",
+          "notes": "Full Windows adapter inventory.",
+          "tags": ["ip", "dhcp"],
+          "os": "windows",
+          "body": "ipconfig /all",
+          "favorite": true
+        },
+        {
+          "title": "Get-NetIPConfiguration",
+          "notes": "PowerShell IP, DNS, and gateway view.",
+          "tags": ["ip"],
+          "os": "windows",
+          "body": "Get-NetIPConfiguration | Format-List"
+        },
+        {
+          "title": "netstat listeners",
+          "notes": "Windows listening ports with PIDs.",
+          "tags": ["ports"],
+          "os": "windows",
+          "body": "netstat -ano | findstr LISTENING"
+        },
+        {
+          "title": "ifconfig / route (macOS)",
+          "notes": "Addresses and default route.",
+          "tags": ["ip"],
+          "os": "macos",
+          "body": "ifconfig; echo; netstat -rn | head -n 20"
+        }
+      ]
+    },
+    {
+      "name": "Troubleshooting",
+      "commands": [
+        {
+          "title": "Service status (systemd)",
+          "notes": "Unit status without a pager.",
+          "tags": ["systemd"],
+          "os": "linux",
+          "body": "systemctl status {{service}} --no-pager -l",
+          "favorite": true
+        },
+        {
+          "title": "Failed units",
+          "notes": "Anything systemd currently marks failed.",
+          "tags": ["systemd"],
+          "os": "linux",
+          "body": "systemctl --failed --no-pager"
+        },
+        {
+          "title": "Process grep",
+          "notes": "Find a process by name.",
+          "tags": ["ps"],
+          "os": "linux",
+          "body": "ps aux | grep -i {{service}} | grep -v grep"
+        },
+        {
+          "title": "Open files for PID",
+          "notes": "Requires lsof. Uses last-used pid.",
+          "tags": ["lsof"],
+          "os": "linux",
+          "body": "lsof -p {{pid}}"
+        },
+        {
+          "title": "Restart unit (copy only)",
+          "notes": "Clipboard only — paste into the remote session yourself.",
+          "tags": ["systemd", "restart"],
+          "os": "linux",
+          "body": "sudo systemctl restart {{service}} && systemctl status {{service}} --no-pager -l"
+        },
+        {
+          "title": "Get-Service",
+          "notes": "Windows service status by name.",
+          "tags": ["service"],
+          "os": "windows",
+          "body": "Get-Service -Name {{service}} | Format-List *"
+        },
+        {
+          "title": "Restart-Service (copy only)",
+          "notes": "Clipboard only. Confirm the service name before pasting.",
+          "tags": ["service", "restart"],
+          "os": "windows",
+          "body": "Restart-Service -Name {{service}} -Force; Get-Service -Name {{service}}"
+        },
+        {
+          "title": "Recent System errors",
+          "notes": "WinEvent errors since N days ago.",
+          "tags": ["eventlog"],
+          "os": "windows",
+          "body": "Get-WinEvent -FilterHashtable @{LogName='System'; Level=2; StartTime=(Get-Date).AddDays(-{{days:1}})} -MaxEvents 40 | Format-Table TimeCreated, Id, ProviderName, Message -Wrap"
+        },
+        {
+          "title": "tasklist by PID",
+          "notes": "Identify a Windows PID.",
+          "tags": ["process"],
+          "os": "windows",
+          "body": "tasklist /FI \"PID eq {{pid}}\""
+        }
+      ]
+    },
+    {
+      "name": "System Info",
+      "commands": [
+        {
+          "title": "uname + os-release",
+          "notes": "Kernel and distro identity.",
+          "tags": ["os"],
+          "os": "linux",
+          "body": "uname -a; echo; cat /etc/os-release"
+        },
+        {
+          "title": "hostnamectl",
+          "notes": "Pretty hostname, chassis, virt.",
+          "tags": ["host"],
+          "os": "linux",
+          "body": "hostnamectl"
+        },
+        {
+          "title": "CPU / memory snapshot",
+          "notes": "Cores, CPU flags summary, RAM.",
+          "tags": ["cpu", "ram"],
+          "os": "linux",
+          "body": "lscpu | egrep 'Model name|CPU\\(s\\)|Thread|Core|Socket|Hypervisor'; echo; free -h"
+        },
+        {
+          "title": "Timedate and timezone",
+          "notes": "Clock skew checks start here.",
+          "tags": ["time"],
+          "os": "linux",
+          "body": "timedatectl; echo; date -Is"
+        },
+        {
+          "title": "systeminfo",
+          "notes": "Classic Windows inventory dump.",
+          "tags": ["os"],
+          "os": "windows",
+          "body": "systeminfo"
+        },
+        {
+          "title": "Get-ComputerInfo (short)",
+          "notes": "OS, hardware, domain fields.",
+          "tags": ["os"],
+          "os": "windows",
+          "body": "Get-ComputerInfo | Select-Object CsName, WindowsProductName, WindowsVersion, OsBuildNumber, CsDomain, CsManufacturer, CsModel, CsTotalPhysicalMemory"
+        },
+        {
+          "title": "sw_vers",
+          "notes": "macOS product version.",
+          "tags": ["os"],
+          "os": "macos",
+          "body": "sw_vers; echo; uname -a; echo; sysctl -n machdep.cpu.brand_string"
+        }
+      ]
+    },
+    {
+      "name": "Disk/Storage",
+      "commands": [
+        {
+          "title": "Filesystem usage",
+          "notes": "Human-readable df with types.",
+          "tags": ["df"],
+          "os": "linux",
+          "body": "df -hT",
+          "favorite": true
+        },
+        {
+          "title": "Block devices",
+          "notes": "lsblk with FS and UUID.",
+          "tags": ["disk"],
+          "os": "linux",
+          "body": "lsblk -o NAME,SIZE,TYPE,FSTYPE,UUID,MOUNTPOINT,MODEL"
+        },
+        {
+          "title": "Directory size",
+          "notes": "One-level disk use for a path.",
+          "tags": ["du"],
+          "os": "linux",
+          "body": "du -h --max-depth=1 {{path:/var/log}} | sort -h"
+        },
+        {
+          "title": "inode use",
+          "notes": "When df looks fine but creates fail.",
+          "tags": ["inodes"],
+          "os": "linux",
+          "body": "df -ih"
+        },
+        {
+          "title": "Get-Volume",
+          "notes": "Windows volume health and free space.",
+          "tags": ["disk"],
+          "os": "windows",
+          "body": "Get-Volume | Format-Table DriveLetter, FileSystemLabel, FileSystem, HealthStatus, SizeRemaining, Size -AutoSize"
+        },
+        {
+          "title": "Get-PhysicalDisk",
+          "notes": "Physical disk health (Storage module).",
+          "tags": ["disk"],
+          "os": "windows",
+          "body": "Get-PhysicalDisk | Format-Table FriendlyName, MediaType, HealthStatus, OperationalStatus, Size, SerialNumber -AutoSize"
+        },
+        {
+          "title": "diskutil list",
+          "notes": "macOS partition map.",
+          "tags": ["disk"],
+          "os": "macos",
+          "body": "diskutil list; echo; df -h"
+        }
+      ]
+    },
+    {
+      "name": "Users/Auth",
+      "commands": [
+        {
+          "title": "Who is logged in",
+          "notes": "Interactive sessions and last boot.",
+          "tags": ["who"],
+          "os": "linux",
+          "body": "who; echo; w; echo; who -b"
+        },
+        {
+          "title": "Last logins",
+          "notes": "Recent successful logins.",
+          "tags": ["last"],
+          "os": "linux",
+          "body": "last -n 25"
+        },
+        {
+          "title": "id for user",
+          "notes": "UID/GID and groups.",
+          "tags": ["id"],
+          "os": "linux",
+          "body": "id {{user}}; echo; getent passwd {{user}}"
+        },
+        {
+          "title": "sudoers snippet",
+          "notes": "Read-only look at sudo rules for a user (may need sudo).",
+          "tags": ["sudo"],
+          "os": "linux",
+          "body": "sudo grep -R --line-number {{user}} /etc/sudoers /etc/sudoers.d 2>/dev/null"
+        },
+        {
+          "title": "whoami /all",
+          "notes": "Windows token groups.",
+          "tags": ["whoami"],
+          "os": "windows",
+          "body": "whoami /all",
+          "favorite": true
+        },
+        {
+          "title": "Get-LocalUser",
+          "notes": "Local accounts and enabled state.",
+          "tags": ["users"],
+          "os": "windows",
+          "body": "Get-LocalUser | Format-Table Name, Enabled, LastLogon, PasswordRequired, PasswordExpires -AutoSize"
+        },
+        {
+          "title": "net user",
+          "notes": "Details for one local Windows user.",
+          "tags": ["users"],
+          "os": "windows",
+          "body": "net user {{user}}"
+        },
+        {
+          "title": "id (macOS)",
+          "notes": "Current or named user.",
+          "tags": ["id"],
+          "os": "macos",
+          "body": "id {{user}}; echo; dscl . -read /Users/{{user}} UniqueID PrimaryGroupID NFSHomeDirectory UserShell 2>/dev/null"
+        }
+      ]
+    },
+    {
+      "name": "Services",
+      "commands": [
+        {
+          "title": "Running services (systemd)",
+          "notes": "Active service units.",
+          "tags": ["systemd"],
+          "os": "linux",
+          "body": "systemctl list-units --type=service --state=running --no-pager"
+        },
+        {
+          "title": "Unit file",
+          "notes": "Resolved unit definition.",
+          "tags": ["systemd"],
+          "os": "linux",
+          "body": "systemctl cat {{service}}"
+        },
+        {
+          "title": "Enablement state",
+          "notes": "enabled / disabled / static.",
+          "tags": ["systemd"],
+          "os": "linux",
+          "body": "systemctl is-enabled {{service}}; systemctl is-active {{service}}"
+        },
+        {
+          "title": "Get-Service running",
+          "notes": "Windows services that are running.",
+          "tags": ["service"],
+          "os": "windows",
+          "body": "Get-Service | Where-Object {$_.Status -eq 'Running'} | Sort-Object Name | Format-Table Name, Status, StartType -AutoSize"
+        },
+        {
+          "title": "sc qc",
+          "notes": "Service config from SCM.",
+          "tags": ["service"],
+          "os": "windows",
+          "body": "sc.exe qc {{service}}"
+        },
+        {
+          "title": "launchctl print (macOS)",
+          "notes": "User domain services; adjust domain if needed.",
+          "tags": ["launchd"],
+          "os": "macos",
+          "body": "launchctl print gui/$(id -u) | head -n 80"
+        }
+      ]
+    },
+    {
+      "name": "Logs",
+      "commands": [
+        {
+          "title": "Unit journal",
+          "notes": "Last 100 lines for a unit.",
+          "tags": ["journalctl"],
+          "os": "linux",
+          "body": "journalctl -u {{service}} -n 100 --no-pager",
+          "favorite": true
+        },
+        {
+          "title": "Journal since N days",
+          "notes": "Errors/priority 3+ in the window.",
+          "tags": ["journalctl"],
+          "os": "linux",
+          "body": "journalctl -p 3 -n 200 --since \"{{days:1}} days ago\" --no-pager"
+        },
+        {
+          "title": "Tail a log file",
+          "notes": "Static tail. Use follow variant for a live session.",
+          "tags": ["tail"],
+          "os": "linux",
+          "body": "tail -n 120 {{path:/var/log/syslog}}"
+        },
+        {
+          "title": "Follow a log file",
+          "notes": "Paste into the remote session; Ctrl+C there to stop.",
+          "tags": ["tail", "follow"],
+          "os": "linux",
+          "body": "tail -f {{path:/var/log/syslog}}"
+        },
+        {
+          "title": "grep errors in log",
+          "notes": "Case-insensitive error/fail lines.",
+          "tags": ["grep"],
+          "os": "linux",
+          "body": "grep -Ei \"error|fail|fatal|panic\" {{path:/var/log/syslog}} | tail -n 80"
+        },
+        {
+          "title": "Application log (WinEvent)",
+          "notes": "Recent Application log errors.",
+          "tags": ["eventlog"],
+          "os": "windows",
+          "body": "Get-WinEvent -FilterHashtable @{LogName='Application'; Level=2; StartTime=(Get-Date).AddDays(-{{days:1}})} -MaxEvents 40 | Format-Table TimeCreated, Id, ProviderName, Message -Wrap"
+        },
+        {
+          "title": "Get-Content log tail",
+          "notes": "Windows file tail.",
+          "tags": ["log"],
+          "os": "windows",
+          "body": "Get-Content -Path {{path:C:\\Windows\\Logs\\CBS\\CBS.log}} -Tail 80"
+        },
+        {
+          "title": "log show (macOS)",
+          "notes": "Last hour of unified log, errors only.",
+          "tags": ["log"],
+          "os": "macos",
+          "body": "log show --last 1h --predicate 'messageType == error' --style compact | tail -n 80"
+        },
+        {
+          "title": "SSH with placeholders",
+          "notes": "Example mixing {{tokens}} and ${VAR}. Copy filled after setting user/host/port.",
+          "tags": ["ssh", "placeholders"],
+          "os": "generic",
+          "body": "ssh ${USER}@{{host}} -p {{port:22}}",
+          "favorite": true
+        }
+      ]
+    }
+  ]
+}
