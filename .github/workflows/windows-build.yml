@@ -2,6 +2,12 @@ name: Windows build
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing GitHub Release tag to attach artifacts to (e.g. v0.1.0)
+        required: false
+        type: string
+        default: v0.1.0
   push:
     tags: ["v*"]
 
@@ -11,6 +17,10 @@ permissions:
 jobs:
   windows:
     runs-on: windows-latest
+    env:
+      # Tag-push uses github.ref_name (v0.1.0). workflow_dispatch uses the tag input
+      # so portable zips can be attached to an existing release without retagging.
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && (inputs.tag || 'v0.1.0') || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -31,8 +41,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "Command Center ${{ github.ref_name }}"
+          tagName: ${{ env.RELEASE_TAG }}
+          releaseName: "Command Center ${{ env.RELEASE_TAG }}"
           releaseDraft: false
           includeUpdaterJson: false
           releaseBody: |
@@ -53,20 +63,20 @@ jobs:
           if (Test-Path $exe) {
             New-Item -ItemType Directory -Force -Path portable-exe | Out-Null
             Copy-Item $exe portable-exe/command-center.exe
-            @"
-            Command Center — portable .exe
-            Double-click command-center.exe. Clipboard only; never executes remotely.
-            If Windows says “Windows protected your PC”, choose More info → Run anyway.
-            "@ | Set-Content portable-exe/README.txt
+            Set-Content -Path portable-exe/README.txt -Value @(
+              'Command Center — portable .exe',
+              'Double-click command-center.exe. Clipboard only; never executes remotely.',
+              'If Windows says "Windows protected your PC", choose More info -> Run anyway.'
+            )
             Compress-Archive -Path portable-exe\* -DestinationPath Command-Center-portable-win64.zip -Force
           }
       - name: Portable web zip
         run: npm run package:portable
       - name: Attach portable zip
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(env.RELEASE_TAG, 'v')
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ env.RELEASE_TAG }}
           draft: false
           files: |
             Command-Center-portable-win64.zip
