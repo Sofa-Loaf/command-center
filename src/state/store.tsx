@@ -121,7 +121,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     async (command: Command, mode: "filled" | "raw") => {
       const filled = fillPlaceholders(command.body, doc.placeholders);
       const text = mode === "raw" ? command.body : filled.text;
-      await copyText(text);
+      try {
+        await copyText(text);
+      } catch {
+        pushToast({ tone: "warn", message: "Clipboard permission denied — select the command body and copy manually." });
+        return;
+      }
       setDocState(markCopied(doc, command.id));
       setCopiedId(command.id);
       if (copiedTimer.current) window.clearTimeout(copiedTimer.current);

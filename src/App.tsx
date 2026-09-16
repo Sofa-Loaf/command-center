@@ -167,8 +167,7 @@ export default function App() {
           <span className="mono">command-center:document</span>
         </span>
         <span>
-          {active ? <span>Active: {active.name}</span> : null}
-          Paste into SSH / RDP / iLO · free forever · offline
+          {active ? `Active: ${active.name}` : "No tab"} · Paste into SSH / RDP / iLO · free forever · offline
         </span>
       </footer>
 

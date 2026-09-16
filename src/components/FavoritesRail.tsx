@@ -29,11 +29,11 @@ export function FavoritesRail() {
               <span className="star" aria-hidden>
                 ★
               </span>
-              <span>
+              <span className="fav-text">
                 <strong>{command.title}</strong>
-                <span>
+                <em>
                   {tab.name} · {command.os}
-                </span>
+                </em>
               </span>
             </button>
           ))
