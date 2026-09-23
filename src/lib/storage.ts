@@ -5,12 +5,16 @@ import {
 import {
   DOCUMENT_KEY,
   SCHEMA_VERSION,
+  LIST_DENSITIES,
   OS_KINDS,
+  SCROLL_MOTIONS,
   THEME_PREFS,
   STANDARD_PLACEHOLDERS,
   type AppDocument,
   type Command,
+  type ListDensity,
   type OsKind,
+  type ScrollMotion,
   type Tab,
   type ThemePref,
 } from "./types";
@@ -30,6 +34,14 @@ function isOsKind(value: unknown): value is OsKind {
 
 function isThemePref(value: unknown): value is ThemePref {
   return typeof value === "string" && (THEME_PREFS as readonly string[]).includes(value);
+}
+
+function isScrollMotion(value: unknown): value is ScrollMotion {
+  return typeof value === "string" && (SCROLL_MOTIONS as readonly string[]).includes(value);
+}
+
+function isListDensity(value: unknown): value is ListDensity {
+  return typeof value === "string" && (LIST_DENSITIES as readonly string[]).includes(value);
 }
 
 function parseCommand(value: unknown): Command | null {
@@ -82,6 +94,8 @@ export function sanitizeDocument(raw: unknown): AppDocument | null {
   return {
     schemaVersion: SCHEMA_VERSION,
     theme: isThemePref(raw.theme) ? raw.theme : "system",
+    scrollMotion: isScrollMotion(raw.scrollMotion) ? raw.scrollMotion : "system",
+    listDensity: isListDensity(raw.listDensity) ? raw.listDensity : "comfortable",
     activeTabId: tabs.some((tab) => tab.id === activeTabId) ? activeTabId : (tabs[0]?.id ?? ""),
     placeholders,
     tabs,

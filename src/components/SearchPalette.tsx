@@ -12,6 +12,7 @@ export function SearchPalette({ onClose }: SearchPaletteProps) {
   const [query, setQuery] = useState("");
   const [index, setIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const activeRef = useRef<HTMLButtonElement>(null);
   const items = useMemo(() => allCommands(doc), [doc]);
   const hits = useMemo(() => searchCommands(items, query).slice(0, 30), [items, query]);
 
@@ -22,6 +23,10 @@ export function SearchPalette({ onClose }: SearchPaletteProps) {
   useEffect(() => {
     setIndex(0);
   }, [query]);
+
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: "nearest" });
+  }, [index, hits]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -61,13 +66,14 @@ export function SearchPalette({ onClose }: SearchPaletteProps) {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
-        <div className="results">
+        <div className="results scroll-region">
           {hits.length === 0 ? (
             <p className="empty">No matches.</p>
           ) : (
             hits.map((hit, hitIndex) => (
               <button
                 key={hit.command.id}
+                ref={hitIndex === index ? activeRef : undefined}
                 className={`result ${hitIndex === index ? "active" : ""}`}
                 type="button"
                 onMouseEnter={() => setIndex(hitIndex)}

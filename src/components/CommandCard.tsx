@@ -69,7 +69,7 @@ export function CommandCard({ command, onEdit }: CommandCardProps) {
         </div>
       ) : null}
       <pre
-        className="body"
+        className="body scroll-region"
         title="Click to copy filled command"
         onClick={() => void copyCommand(command, "filled")}
       >

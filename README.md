@@ -23,7 +23,7 @@ You do **not** need to build anything.
 2. On the release page, pick one:
    - **`Command Center_..._x64-setup.exe`** — installer (Start-menu shortcut). Prefer this when it is listed.
    - **`Command-Center-portable-win64.zip`** — unzip and double-click **`command-center.exe`**.
-   - **`Command-Center-0.1.0-portable-win64.zip`** — unzip and double-click **`START.bat`** (portable web app).
+   - **`Command-Center-0.2.0-portable-win64.zip`** — unzip and double-click **`START.bat`** (portable web app).
    - An **`.msi`** is also there if your workplace prefers that.
 3. If Windows says **“Windows protected your PC”**, click **More info**, then **Run anyway**. This app is new and may not be signed yet.
 
@@ -32,7 +32,8 @@ You do **not** need to build anything.
 1. Pick a tab (Diagnostics, Networking, Troubleshooting, …).
 2. Fill the placeholder bar (`host`, `ip`, `user`, `port`, …). Last-used values stick.
 3. Click a command card (or **Copy filled**). Paste into the remote session.
-4. Press **`/`** or **Ctrl+K** to search. **Enter** copies the selected command. **Esc** closes.
+4. Press **`/`** or **Ctrl+K** to search. **Enter** copies the selected command. **Esc** closes. Arrow keys move the highlight; the list scrolls inside the palette.
+5. **Display** sets scroll jumps (system / smooth / instant) and list density (comfortable / compact). Both stick in localStorage with the theme. Command lists, tabs, and favorites scroll inside their panels — the header stays put.
 
 The library lives in this browser/app only, under localStorage key **`command-center:document`**.
 
@@ -50,6 +51,8 @@ Does:
 - Import JSON, text, Markdown, or YAML
 - Export the whole library or the current tab as JSON
 - Dark and light mode (toggle, persisted, respects `prefers-color-scheme` until you pick)
+- Panels scroll on their own: command list, favorites, tabs, search results, placeholder bar, and editors. Headers and the toolbar stay on screen
+- Display settings: scroll motion (`system` follows reduced motion, or force smooth / instant jumps) and list density (comfortable / compact). Saved in the same localStorage document as the theme
 
 Does not (on purpose):
 
@@ -94,8 +97,8 @@ On a Windows machine (PowerShell):
 Cut a GitHub Release (after merge to `main`):
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
 ```
 
 More notes: [`docs/WINDOWS_BUILD.md`](docs/WINDOWS_BUILD.md).

@@ -96,7 +96,7 @@ export function LibraryMenu({ onReset }: LibraryMenuProps) {
                 ×
               </button>
             </div>
-            <div className="modal-bd">
+            <div className="modal-bd scroll-region">
               <div
                 className="drop"
                 onDragOver={(event) => event.preventDefault()}

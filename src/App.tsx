@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CommandCard } from "./components/CommandCard";
 import { CommandEditor } from "./components/CommandEditor";
 import { ConfirmDialog } from "./components/ConfirmDialog";
+import { DisplayMenu } from "./components/DisplayMenu";
 import { FavoritesRail } from "./components/FavoritesRail";
 import { LibraryMenu } from "./components/LibraryMenu";
 import { PlaceholderBar } from "./components/PlaceholderBar";
 import { SearchPalette } from "./components/SearchPalette";
 import { TabList } from "./components/TabList";
+import { TabStrip } from "./components/TabStrip";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { Toasts } from "./components/Toasts";
 import { allCommands, findTab } from "./lib/library";
@@ -27,6 +29,7 @@ export default function App() {
   const [editor, setEditor] = useState<{ tabId: string; command: Command | null } | null>(null);
   const [osFilter, setOsFilter] = useState<OsFilter>("all");
   const [resetOpen, setResetOpen] = useState(false);
+  const paneRef = useRef<HTMLDivElement>(null);
   const active = findTab(doc, doc.activeTabId) ?? doc.tabs[0];
   const stats = useMemo(() => {
     const commands = allCommands(doc);
@@ -42,6 +45,10 @@ export default function App() {
     if (osFilter === "favorite") return commands.filter((command) => command.favorite);
     return commands.filter((command) => command.os === osFilter);
   }, [active, osFilter]);
+
+  useEffect(() => {
+    paneRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  }, [active?.id, osFilter]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -88,6 +95,7 @@ export default function App() {
           </span>
         </button>
         <ThemeToggle />
+        <DisplayMenu />
         <LibraryMenu onReset={() => setResetOpen(true)} />
       </header>
 
@@ -97,14 +105,15 @@ export default function App() {
         <aside className="rail">
           <FavoritesRail />
           <TabList onRename={rename} />
-          <div style={{ padding: "8px 12px 12px" }}>
-            <button className="btn" type="button" onClick={addTabPrompt} style={{ width: "100%" }}>
+          <div className="rail-new">
+            <button className="btn" type="button" onClick={addTabPrompt}>
               + New tab
             </button>
           </div>
         </aside>
 
         <main className="main">
+          <TabStrip />
           <div className="toolbar">
             <strong>{active?.name ?? "No tab"}</strong>
             <span className="notes">{visible.length} shown</span>
@@ -143,21 +152,23 @@ export default function App() {
             </button>
           </div>
 
-          {visible.length === 0 ? (
-            <div className="empty">
-              No commands in this view. Add one, import a library, or clear the OS filter.
-            </div>
-          ) : (
-            <div className="grid">
-              {visible.map((command) => (
-                <CommandCard
-                  key={command.id}
-                  command={command}
-                  onEdit={(item) => active && setEditor({ tabId: active.id, command: item })}
-                />
-              ))}
-            </div>
-          )}
+          <div className="command-pane scroll-region" ref={paneRef}>
+            {visible.length === 0 ? (
+              <div className="empty">
+                No commands in this view. Add one, import a library, or clear the OS filter.
+              </div>
+            ) : (
+              <div className="grid">
+                {visible.map((command) => (
+                  <CommandCard
+                    key={command.id}
+                    command={command}
+                    onEdit={(item) => active && setEditor({ tabId: active.id, command: item })}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </main>
       </div>
 

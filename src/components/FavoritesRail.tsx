@@ -6,12 +6,12 @@ export function FavoritesRail() {
   const favorites = favoriteCommands(doc);
 
   return (
-    <section className="rail-section">
+    <section className="rail-section rail-favorites">
       <div className="rail-hd">
         <span>Quick · Favorites</span>
         <span>{favorites.length}</span>
       </div>
-      <div className="fav-list">
+      <div className="fav-list scroll-region">
         {favorites.length === 0 ? (
           <p className="notes" style={{ padding: "0 8px" }}>
             Star a command to pin it here.

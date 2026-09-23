@@ -8,6 +8,13 @@ export const THEME_PREFS = ["system", "light", "dark"] as const;
 export type ThemePref = (typeof THEME_PREFS)[number];
 export type ResolvedTheme = "light" | "dark";
 
+/** System follows prefers-reduced-motion. Smooth and instant are explicit. */
+export const SCROLL_MOTIONS = ["system", "smooth", "instant"] as const;
+export type ScrollMotion = (typeof SCROLL_MOTIONS)[number];
+
+export const LIST_DENSITIES = ["comfortable", "compact"] as const;
+export type ListDensity = (typeof LIST_DENSITIES)[number];
+
 export const STANDARD_PLACEHOLDERS = [
   "host",
   "ip",
@@ -41,6 +48,8 @@ export interface Tab {
 export interface AppDocument {
   schemaVersion: typeof SCHEMA_VERSION;
   theme: ThemePref;
+  scrollMotion: ScrollMotion;
+  listDensity: ListDensity;
   activeTabId: string;
   placeholders: Record<string, string>;
   tabs: Tab[];
