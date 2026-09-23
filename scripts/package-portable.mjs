@@ -4,14 +4,17 @@
  * Used as a public download when a Tauri installer is not available,
  * and as an extra artifact beside the installer.
  */
-import { cpSync, mkdirSync, rmSync, writeFileSync, existsSync } from "node:fs";
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+const version = typeof pkg.version === "string" ? pkg.version : "0.0.0";
+const zipName = `Command-Center-${version}-portable-win64.zip`;
 const outDir = join(root, "dist-portable", "Command-Center-portable");
-const zipPath = join(root, "dist-portable", "Command-Center-0.1.0-portable-win64.zip");
+const zipPath = join(root, "dist-portable", zipName);
 const dist = join(root, "dist");
 
 function run(cmd, args) {
@@ -104,6 +107,7 @@ This zip is a free, runnable clipboard command palette. Double-click START.bat.
 
 What you get
 - The same UI: tabs, command cards, placeholders, search, dark/light mode
+- Lists scroll inside the window. Display sets smooth or instant jumps and compact density
 - Library stored in the browser as localStorage key command-center:document
 - Works offline after the page loads
 
@@ -127,7 +131,7 @@ const zipResult = spawnSync("zip", ["-r", "-9", zipPath, "Command-Center-portabl
 if (zipResult.status !== 0) {
   const pyArgs = [
     "-c",
-    "import shutil; shutil.make_archive('Command-Center-0.1.0-portable-win64', 'zip', '.', 'Command-Center-portable')",
+    `import shutil; shutil.make_archive(${JSON.stringify(zipName.replace(/\.zip$/, ""))}, 'zip', '.', 'Command-Center-portable')`,
   ];
   let packed = false;
   for (const bin of ["python3", "python"]) {
@@ -143,7 +147,7 @@ if (zipResult.status !== 0) {
       [
         "-NoProfile",
         "-Command",
-        "Compress-Archive -Path Command-Center-portable -DestinationPath Command-Center-0.1.0-portable-win64.zip -Force",
+        `Compress-Archive -Path Command-Center-portable -DestinationPath ${zipName} -Force`,
       ],
       { cwd: join(root, "dist-portable"), stdio: "inherit" },
     );

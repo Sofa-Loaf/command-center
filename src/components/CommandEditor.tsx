@@ -65,7 +65,7 @@ export function CommandEditor({ tabId, command, onClose }: CommandEditorProps) {
             ×
           </button>
         </div>
-        <div className="modal-bd">
+        <div className="modal-bd scroll-region">
           <div className="fields">
             <label className="field">
               Title

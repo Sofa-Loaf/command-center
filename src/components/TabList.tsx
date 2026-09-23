@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "../state/store";
 import { ConfirmDialog } from "./ConfirmDialog";
 
@@ -10,14 +10,19 @@ export function TabList({ onRename }: TabListProps) {
   const { doc, selectTab, reorderTab, removeTab } = useStore();
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
   const pending = doc.tabs.find((tab) => tab.id === pendingDelete);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    listRef.current?.querySelector<HTMLElement>(".tab.active")?.scrollIntoView({ block: "nearest" });
+  }, [doc.activeTabId]);
 
   return (
-    <section className="rail-section" style={{ minHeight: 0, flex: 1, display: "flex", flexDirection: "column" }}>
+    <section className="rail-section rail-tabs">
       <div className="rail-hd">
         <span>Tabs</span>
         <span>{doc.tabs.length}</span>
       </div>
-            <div className="tab-list" style={{ flex: 1 }}>
+      <div className="tab-list scroll-region" ref={listRef}>
         {doc.tabs.map((tab, index) => (
           <div
             className="tab-row"

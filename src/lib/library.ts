@@ -9,6 +9,8 @@ import {
   type Command,
   type OsKind,
   type StarterLibrary,
+  type ListDensity,
+  type ScrollMotion,
   type Tab,
   type ThemePref,
 } from "./types";
@@ -108,6 +110,8 @@ export function buildStarterDocument(): AppDocument {
   return {
     schemaVersion: SCHEMA_VERSION,
     theme: "system",
+    scrollMotion: "system",
+    listDensity: "comfortable",
     activeTabId: tabs[0]?.id ?? "",
     placeholders: emptyPlaceholders(),
     tabs,
@@ -160,6 +164,14 @@ export function touch(doc: AppDocument): AppDocument {
 
 export function setTheme(doc: AppDocument, theme: ThemePref): AppDocument {
   return touch({ ...doc, theme });
+}
+
+export function setScrollMotion(doc: AppDocument, scrollMotion: ScrollMotion): AppDocument {
+  return touch({ ...doc, scrollMotion });
+}
+
+export function setListDensity(doc: AppDocument, listDensity: ListDensity): AppDocument {
+  return touch({ ...doc, listDensity });
 }
 
 export function setActiveTab(doc: AppDocument, tabId: string): AppDocument {
@@ -341,8 +353,13 @@ export function replaceWithImportedTabs(doc: AppDocument, incoming: Tab[]): AppD
   });
 }
 
-export function resetLibrary(theme: ThemePref): AppDocument {
-  return touch({ ...buildStarterDocument(), theme });
+export function resetLibrary(current: AppDocument): AppDocument {
+  return touch({
+    ...buildStarterDocument(),
+    theme: current.theme,
+    scrollMotion: current.scrollMotion,
+    listDensity: current.listDensity,
+  });
 }
 
 export function snapshot(doc: AppDocument): AppDocument {

@@ -8,6 +8,9 @@ import {
   duplicateCommand,
   moveTab,
   renameTab,
+  resetLibrary,
+  setListDensity,
+  setScrollMotion,
   toggleFavorite,
 } from "./library";
 
@@ -29,6 +32,30 @@ describe("library", () => {
     expect(doc.tabs.some((tab) => tab.commands.some((command) => command.os === "linux"))).toBe(true);
     expect(doc.tabs.some((tab) => tab.commands.some((command) => command.os === "windows"))).toBe(true);
     expect(doc.tabs.some((tab) => tab.commands.some((command) => command.favorite))).toBe(true);
+    expect(doc.scrollMotion).toBe("system");
+    expect(doc.listDensity).toBe("comfortable");
+  });
+
+  it("keeps theme and scroll prefs when the library is reset", () => {
+    const doc = {
+      ...buildStarterDocument(),
+      theme: "light" as const,
+      scrollMotion: "instant" as const,
+      listDensity: "compact" as const,
+    };
+    const reset = resetLibrary(doc);
+    expect(reset.theme).toBe("light");
+    expect(reset.scrollMotion).toBe("instant");
+    expect(reset.listDensity).toBe("compact");
+    expect(reset.tabs.map((tab) => tab.name)).toEqual(doc.tabs.map((tab) => tab.name));
+  });
+
+  it("updates scroll motion and density without dropping tabs", () => {
+    const doc = buildStarterDocument();
+    const next = setListDensity(setScrollMotion(doc, "smooth"), "compact");
+    expect(next.scrollMotion).toBe("smooth");
+    expect(next.listDensity).toBe("compact");
+    expect(next.tabs.length).toBe(doc.tabs.length);
   });
 
   it("supports tab crud and reorder", () => {

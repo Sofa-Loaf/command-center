@@ -1,6 +1,6 @@
 [package]
 name = "command-center"
-version = "0.1.0"
+version = "0.2.0"
 description = "Command Center — clipboard command palette for remote work"
 authors = ["Command Center"]
 edition = "2021"

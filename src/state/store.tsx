@@ -14,7 +14,9 @@ import {
   replaceWithImportedTabs,
   resetLibrary,
   setActiveTab,
+  setListDensity,
   setPlaceholders,
+  setScrollMotion,
   setTheme,
   snapshot,
   toggleFavorite,
@@ -22,8 +24,9 @@ import {
 } from "../lib/library";
 import { fillPlaceholders } from "../lib/placeholders";
 import { loadDocument, saveDocument } from "../lib/storage";
+import { applyScroll, prefersReducedMotion, resolveScrollBehavior } from "../lib/scroll";
 import { applyTheme, cycleTheme, prefersDark, resolveTheme } from "../lib/theme";
-import type { AppDocument, Command, ThemePref } from "../lib/types";
+import type { AppDocument, Command, ListDensity, ScrollMotion, ThemePref } from "../lib/types";
 
 export interface ToastItem {
   id: string;
@@ -43,6 +46,9 @@ interface StoreValue {
   setDoc: (doc: AppDocument) => void;
   cycleColorMode: () => void;
   setColorMode: (theme: ThemePref) => void;
+  setScrollMotion: (motion: ScrollMotion) => void;
+  setListDensity: (density: ListDensity) => void;
+  resolvedScroll: "smooth" | "auto";
   updatePlaceholders: (patch: Record<string, string>) => void;
   selectTab: (id: string) => void;
   createTab: (name: string) => void;
@@ -70,13 +76,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [systemDark, setSystemDark] = useState(prefersDark);
+  const [reducedMotion, setReducedMotion] = useState(prefersReducedMotion);
   const copiedTimer = useRef<number | null>(null);
 
   const resolvedTheme = resolveTheme(doc.theme, systemDark);
+  const resolvedScroll = resolveScrollBehavior(doc.scrollMotion, reducedMotion);
 
   useEffect(() => {
     applyTheme(doc.theme, resolvedTheme);
   }, [doc.theme, resolvedTheme]);
+
+  useEffect(() => {
+    applyScroll(doc.scrollMotion, resolvedScroll, doc.listDensity);
+  }, [doc.listDensity, doc.scrollMotion, resolvedScroll]);
 
   useEffect(() => {
     saveDocument(doc);
@@ -85,6 +97,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const onChange = () => setSystemDark(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setReducedMotion(mq.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
@@ -157,6 +176,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setDoc,
       cycleColorMode: () => setDocState(setTheme(doc, cycleTheme(doc.theme))),
       setColorMode: (theme) => setDocState(setTheme(doc, theme)),
+      setScrollMotion: (motion) => setDocState((current) => setScrollMotion(current, motion)),
+      setListDensity: (density) => setDocState((current) => setListDensity(current, density)),
+      resolvedScroll,
       updatePlaceholders: (patch) => setDocState(setPlaceholders(doc, patch)),
       selectTab: (id) => setDocState(setActiveTab(doc, id)),
       createTab: (name) => setDocState(addTab(doc, name)),
@@ -179,10 +201,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       importTabs: (tabs, mode) =>
         setDocState(mode === "replace" ? replaceWithImportedTabs(doc, tabs) : mergeImportedTabs(doc, tabs)),
       restoreStarter: () =>
-        withUndo("Library reset to starter pack", (current) => resetLibrary(current.theme)),
+        withUndo("Library reset to starter pack", (current) => resetLibrary(current)),
       copyCommand,
     }),
-    [copiedId, copyCommand, dismissToast, doc, pushToast, resolvedTheme, setDoc, toasts, withUndo],
+    [copiedId, copyCommand, dismissToast, doc, pushToast, resolvedScroll, resolvedTheme, setDoc, toasts, withUndo],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

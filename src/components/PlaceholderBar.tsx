@@ -24,7 +24,7 @@ export function PlaceholderBar() {
   const keys = [...STANDARD_PLACEHOLDERS, ...extras];
 
   return (
-    <div className="phbar" aria-label="Placeholder values">
+    <div className="phbar scroll-region" aria-label="Placeholder values">
       {keys.map((key) => (
         <label className={`ph-field ${key === "path" || key === "host" ? "wide" : ""}`} key={key}>
           <span>{LABELS[key] ?? key}</span>
