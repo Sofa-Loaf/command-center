@@ -1,5 +1,6 @@
 import starter from "../../examples/commands.json";
 import { createId } from "./ids";
+import { createPlaceholderMap } from "./placeholders";
 import {
   DOCUMENT_KEY,
   OS_KINDS,
@@ -27,7 +28,7 @@ const DEFAULT_TAB_NAMES = [
 ] as const;
 
 function emptyPlaceholders(): Record<string, string> {
-  const values: Record<string, string> = {};
+  const values = createPlaceholderMap();
   for (const key of STANDARD_PLACEHOLDERS) {
     values[key] = "";
   }
@@ -183,7 +184,7 @@ export function setPlaceholders(
   doc: AppDocument,
   patch: Record<string, string>,
 ): AppDocument {
-  const placeholders = { ...doc.placeholders };
+  const placeholders = createPlaceholderMap(doc.placeholders);
   for (const [key, value] of Object.entries(patch)) {
     placeholders[key.trim().toLowerCase()] = value;
   }
@@ -363,7 +364,8 @@ export function resetLibrary(current: AppDocument): AppDocument {
 }
 
 export function snapshot(doc: AppDocument): AppDocument {
-  return clone(doc);
+  const cloned = clone(doc);
+  return { ...cloned, placeholders: createPlaceholderMap(cloned.placeholders) };
 }
 
 export { DOCUMENT_KEY, emptyPlaceholders };

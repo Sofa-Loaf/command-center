@@ -2,6 +2,7 @@ import {
   defaultDocument,
   snapshot,
 } from "./library";
+import { createPlaceholderMap } from "./placeholders";
 import {
   DOCUMENT_KEY,
   SCHEMA_VERSION,
@@ -82,7 +83,7 @@ export function sanitizeDocument(raw: unknown): AppDocument | null {
     : [];
   if (tabs.length === 0) return null;
 
-  const placeholders: Record<string, string> = {};
+  const placeholders = createPlaceholderMap();
   for (const key of STANDARD_PLACEHOLDERS) placeholders[key] = "";
   if (isRecord(raw.placeholders)) {
     for (const [key, value] of Object.entries(raw.placeholders)) {

@@ -50,6 +50,23 @@ export function uniqueTokenNames(body: string): string[] {
   return names;
 }
 
+/** Own string values only. Inherited names (`constructor`, `toString`, `__proto__`) stay unfilled. */
+export function readPlaceholder(values: object, key: string): string | undefined {
+  if (!Object.prototype.hasOwnProperty.call(values, key)) return undefined;
+  const value = (values as Record<string, unknown>)[key];
+  return typeof value === "string" ? value : undefined;
+}
+
+export function createPlaceholderMap(source?: object | null): Record<string, string> {
+  const values = Object.create(null) as Record<string, string>;
+  if (source) {
+    for (const [key, value] of Object.entries(source)) {
+      if (typeof value === "string") values[key] = value;
+    }
+  }
+  return values;
+}
+
 export function fillPlaceholders(
   body: string,
   values: Record<string, string>,
@@ -63,7 +80,7 @@ export function fillPlaceholders(
     const name = String(braceName ?? dollarName ?? "");
     const fallback = (braceDefault ?? dollarDefault) as string | undefined;
     const key = normalizePlaceholderName(name);
-    const stored = values[key] ?? values[name] ?? "";
+    const stored = readPlaceholder(values, key) ?? readPlaceholder(values, name) ?? "";
     const trimmed = stored.trim();
     if (trimmed) {
       if (!seenUsed.has(key)) {

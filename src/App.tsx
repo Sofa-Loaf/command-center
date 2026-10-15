@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CommandCard } from "./components/CommandCard";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { CommandEditor } from "./components/CommandEditor";
 import { ConfirmDialog } from "./components/ConfirmDialog";
 import { DisplayMenu } from "./components/DisplayMenu";
@@ -99,7 +100,9 @@ export default function App() {
         <LibraryMenu onReset={() => setResetOpen(true)} />
       </header>
 
-      <PlaceholderBar />
+      <ErrorBoundary variant="bar">
+        <PlaceholderBar />
+      </ErrorBoundary>
 
       <div className="workspace">
         <aside className="rail">
@@ -153,21 +156,24 @@ export default function App() {
           </div>
 
           <div className="command-pane scroll-region" ref={paneRef}>
-            {visible.length === 0 ? (
-              <div className="empty">
-                No commands in this view. Add one, import a library, or clear the OS filter.
-              </div>
-            ) : (
-              <div className="grid">
-                {visible.map((command) => (
-                  <CommandCard
-                    key={command.id}
-                    command={command}
-                    onEdit={(item) => active && setEditor({ tabId: active.id, command: item })}
-                  />
-                ))}
-              </div>
-            )}
+            <ErrorBoundary variant="pane">
+              {visible.length === 0 ? (
+                <div className="empty">
+                  No commands in this view. Add one, import a library, or clear the OS filter.
+                </div>
+              ) : (
+                <div className="grid">
+                  {visible.map((command) => (
+                    <ErrorBoundary key={command.id} variant="card">
+                      <CommandCard
+                        command={command}
+                        onEdit={(item) => active && setEditor({ tabId: active.id, command: item })}
+                      />
+                    </ErrorBoundary>
+                  ))}
+                </div>
+              )}
+            </ErrorBoundary>
           </div>
         </main>
       </div>

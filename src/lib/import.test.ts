@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { detectAndParse, importedToTabs } from "./import";
+import { detectAndParse, importFileTooLarge, importedToTabs, MAX_IMPORT_BYTES } from "./import";
 import { buildStarterDocument } from "./library";
 import { searchCommands } from "./search";
 import { libraryForExport, toJson } from "./export";
@@ -69,5 +69,12 @@ Who owns the port.
     expect(parsed.format).toBe("text");
     expect(parsed.tabs[0]?.commands).toHaveLength(2);
     expect(parsed.tabs[0]?.commands[1]?.body).toBe("whoami");
+  });
+
+  it("flags import files over 2 MB", () => {
+    expect(MAX_IMPORT_BYTES).toBe(2 * 1024 * 1024);
+    expect(importFileTooLarge(MAX_IMPORT_BYTES)).toBe(false);
+    expect(importFileTooLarge(MAX_IMPORT_BYTES + 1)).toBe(true);
+    expect(importFileTooLarge(Number.NaN)).toBe(true);
   });
 });

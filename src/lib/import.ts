@@ -2,6 +2,13 @@ import yaml from "js-yaml";
 import { createEmptyTab, normalizeCommand } from "./library";
 import { OS_KINDS, type ImportResult, type ImportedCommand, type ImportedTab, type OsKind, type Tab } from "./types";
 
+/** Imported files larger than this are refused before they are read into memory. */
+export const MAX_IMPORT_BYTES = 2 * 1024 * 1024;
+
+export function importFileTooLarge(byteLength: number): boolean {
+  return !Number.isFinite(byteLength) || byteLength > MAX_IMPORT_BYTES;
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
