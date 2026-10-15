@@ -869,6 +869,59 @@ kbd {
   color: var(--text-muted);
 }
 
+.crash {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  color: var(--text);
+}
+
+.crash h2 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.crash p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.crash-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.crash-app {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.crash-app.crash {
+  width: min(460px, 100%);
+}
+
+.crash-pane {
+  margin: 24px auto;
+  width: min(460px, calc(100% - 32px));
+}
+
+.crash-card h2,
+.crash-bar h2 {
+  font-size: 13px;
+}
+
+.crash-bar {
+  margin: 8px 12px;
+}
+
 .drop {
   border: 1px dashed var(--line-strong);
   border-radius: 8px;

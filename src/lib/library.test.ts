@@ -10,7 +10,9 @@ import {
   renameTab,
   resetLibrary,
   setListDensity,
+  setPlaceholders,
   setScrollMotion,
+  snapshot,
   toggleFavorite,
 } from "./library";
 
@@ -34,6 +36,18 @@ describe("library", () => {
     expect(doc.tabs.some((tab) => tab.commands.some((command) => command.favorite))).toBe(true);
     expect(doc.scrollMotion).toBe("system");
     expect(doc.listDensity).toBe("comfortable");
+    expect(Object.getPrototypeOf(doc.placeholders)).toBeNull();
+  });
+
+  it("keeps placeholder updates off Object.prototype", () => {
+    const doc = setPlaceholders(buildStarterDocument(), { host: "lab", constructor: "nope" });
+    expect(Object.getPrototypeOf(doc.placeholders)).toBeNull();
+    expect(doc.placeholders.host).toBe("lab");
+    expect(doc.placeholders.constructor).toBe("nope");
+    const snap = snapshot(doc);
+    expect(Object.getPrototypeOf(snap.placeholders)).toBeNull();
+    expect(snap.placeholders.host).toBe("lab");
+    expect(({} as { nope?: unknown }).nope).toBeUndefined();
   });
 
   it("keeps theme and scroll prefs when the library is reset", () => {

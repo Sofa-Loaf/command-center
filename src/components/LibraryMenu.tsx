@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { detectAndParse, importedToTabs } from "../lib/import";
+import { detectAndParse, importFileTooLarge, importedToTabs } from "../lib/import";
 import { downloadText, libraryForExport, slugify, tabForExport, toJson, toYaml } from "../lib/export";
 import { findTab } from "../lib/library";
 import { useStore } from "../state/store";
@@ -44,6 +44,17 @@ export function LibraryMenu({ onReset }: LibraryMenuProps) {
   function exportYaml() {
     downloadText("command-center-library.yaml", toYaml(libraryForExport(doc)), "text/yaml");
     setOpen(false);
+  }
+
+  function loadFile(file: File) {
+    if (importFileTooLarge(file.size)) {
+      pushToast({ tone: "warn", message: "That file is over 2 MB. Choose a smaller library." });
+      return;
+    }
+    void file.text().then((text) => {
+      setFilename(file.name);
+      setDraft(text);
+    });
   }
 
   function runImport(text: string, name: string) {
@@ -104,10 +115,7 @@ export function LibraryMenu({ onReset }: LibraryMenuProps) {
                   event.preventDefault();
                   const file = event.dataTransfer.files[0];
                   if (!file) return;
-                  void file.text().then((text) => {
-                    setFilename(file.name);
-                    setDraft(text);
-                  });
+                  loadFile(file);
                 }}
               >
                 Drop a .json / .yaml / .md / .txt file, or{" "}
@@ -122,10 +130,7 @@ export function LibraryMenu({ onReset }: LibraryMenuProps) {
                   onChange={(event) => {
                     const file = event.target.files?.[0];
                     if (!file) return;
-                    void file.text().then((text) => {
-                      setFilename(file.name);
-                      setDraft(text);
-                    });
+                    loadFile(file);
                   }}
                 />
               </div>
